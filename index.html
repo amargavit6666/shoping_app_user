@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maruti Mobile & Electronics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- THEME: GREEN EVOLUTION (AMAZON STYLE) --- */
+        :root {
+            --primary: #2E7D32;       /* Amazon-ish Dark Green Header */
+            --primary-light: #43A047; /* Lighter Green */
+            --accent: #FFD814;        /* Amazon Yellow for Buttons */
+            --accent-hover: #F7CA00;
+            --bg: #EAEDED;            /* Light Gray Background (Amazon style) */
+            --white: #FFFFFF;
+            --text: #0F1111;          /* Almost Black */
+            --text-gray: #565959;
+            --danger: #B12704;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; padding-top: 110px; }
+
+        /* --- HEADER & SEARCH (Fixed Top) --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .header-top { display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; }
+        .app-logo { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+        .header-icons { display: flex; gap: 15px; align-items: center; }
+        .cart-icon { position: relative; font-size: 1.2rem; }
+        .badge { position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 50%; font-weight: bold; }
+
+        .search-area { padding: 0 10px 10px 10px; }
+        .search-box {
+            background: white; border-radius: 8px; display: flex; align-items: center; padding: 0 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .search-box input { width: 100%; padding: 10px; border: none; outline: none; font-size: 1rem; }
+        .search-box i { color: var(--text-gray); }
+
+        /* --- HOME: SLIDER --- */
+        .slider-wrapper { margin-top: 5px; overflow: hidden; width: 100%; background: var(--white); }
+        .slider { display: flex; transition: transform 0.5s ease-in-out; }
+        .slide { min-width: 100%; height: 180px; object-fit: cover; }
+
+        /* --- HOME: CATEGORIES (Horizontal Scroll) --- */
+        .section-title { padding: 15px 15px 5px; font-weight: 700; font-size: 1.1rem; color: var(--text); }
+        .cat-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 10px 15px; scrollbar-width: none; background: white; margin-bottom: 10px; }
+        .cat-item { display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+        .cat-img-box { width: 60px; height: 60px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 5px; border: 2px solid transparent; transition: 0.2s; }
+        .cat-item.active .cat-img-box { border-color: var(--primary); background: #E8F5E9; }
+        .cat-img-box img { width: 40px; height: 40px; object-fit: contain; }
+        .cat-name { font-size: 0.8rem; color: var(--text-gray); text-align: center; }
+
+        /* --- PRODUCT GRID (Amazon Style) --- */
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
+        .product-card {
+            background: white; border-radius: 8px; overflow: hidden; position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+            transition: transform 0.2s;
+        }
+        .product-card:active { transform: scale(0.98); }
+        .p-img-container { height: 160px; padding: 10px; display: flex; align-items: center; justify-content: center; background: white; }
+        .p-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .p-details { padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .p-title { font-size: 0.9rem; line-height: 1.3; height: 38px; overflow: hidden; color: var(--text); margin-bottom: 5px; }
+        
+        .rating-stars { color: #FFA41C; font-size: 0.7rem; margin-bottom: 5px; }
+        
+        .p-price-row { display: flex; align-items: baseline; gap: 5px; margin-bottom: 8px; }
+        .p-symbol { font-size: 0.8rem; vertical-align: top; }
+        .p-price { font-size: 1.3rem; font-weight: 700; color: var(--text); }
+        .p-mrp { font-size: 0.8rem; color: var(--text-gray); text-decoration: line-through; }
+        
+        .p-btn {
+            background: var(--accent); color: var(--text); border: none; padding: 8px; width: 100%;
+            border-radius: 20px; font-weight: 500; font-size: 0.85rem; cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%; background: white; border-top: 1px solid #ddd;
+            display: flex; justify-content: space-around; padding: 8px 0; z-index: 1000;
+        }
+        .nav-btn { background: none; border: none; color: var(--text-gray); font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 25%; }
+        .nav-btn i { font-size: 1.2rem; }
+        .nav-btn.active { color: var(--primary); font-weight: bold; }
+
+        /* --- MODAL: AUTH & PRODUCT DETAILS --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+            z-index: 2000; display: none; align-items: flex-end; /* Bottom Sheet */
+        }
+        .modal-overlay.open { display: flex; animation: slideUp 0.3s; }
+        
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .bottom-sheet {
+            background: white; width: 100%; border-radius: 20px 20px 0 0; padding: 20px;
+            max-height: 85vh; overflow-y: auto; position: relative;
+        }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #999; cursor: pointer; }
+
+        /* Auth Styles inside Modal */
+        .auth-box h2 { color: var(--primary); margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; }
+        .input-field { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; }
+        .full-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+
+        /* Product Detail Styles inside Modal */
+        .pd-img { width: 100%; height: 250px; object-fit: contain; margin-bottom: 15px; }
+        .pd-title { font-size: 1.1rem; font-weight: 500; margin-bottom: 10px; }
+        .pd-price { font-size: 1.5rem; font-weight: 700; color: var(--danger); margin-bottom: 20px; }
+        .pd-desc { font-size: 0.9rem; color: #555; line-height: 1.5; margin-bottom: 20px; }
+        
+        /* Views */
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <div class="app-logo">
+                <i class="fab fa-android"></i> Maruti Store
+            </div>
+            <div class="header-icons">
+                <div class="cart-icon" onclick="openCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="badge" id="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="search-area">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search for mobiles, electronics...">
+            </div>
+        </div>
+    </header>
+
+    <div id="view-home" class="view-section active">
+        <div class="slider-wrapper">
+            <div class="slider" id="banner-slider">
+                </div>
+        </div>
+
+        <div class="cat-scroll" id="cat-list">
+            <div class="cat-item active" onclick="filterCat('All', this)">
+                <div class="cat-img-box"><i class="fas fa-th-large"></i></div>
+                <div class="cat-name">All</div>
+            </div>
+            </div>
+
+        <h3 class="section-title">Best Sellers</h3>
+        <div class="product-grid" id="product-grid">
+            <div style="grid-column: span 2; text-align:center; padding:20px; color:#666;">Loading Products...</div>
+        </div>
+    </div>
+
+    <div id="view-cart" class="view-section">
+        <h2 class="section-title">Shopping Cart</h2>
+        <div id="cart-container" style="padding: 10px;"></div>
+        
+        <div style="background: white; padding: 20px; position: fixed; bottom: 60px; width: 100%; border-top: 1px solid #ddd; display:none;" id="checkout-bar">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <span style="font-size:1.1rem; font-weight:bold;">Total:</span>
+                <span style="font-size:1.1rem; font-weight:bold; color:var(--danger);" id="final-total">₹0</span>
+            </div>
+            <button class="full-btn" style="background: var(--accent); color:black;" onclick="initCheckout()">Proceed to Buy</button>
+        </div>
+    </div>
+
+    <div id="view-profile" class="view-section">
+        <div style="padding: 20px; background: white; margin-bottom: 10px;">
+            <h2 id="user-name-disp">Guest User</h2>
+            <p id="user-email-disp" style="color:#666; font-size:0.9rem;">Please login to view orders</p>
+        </div>
+        <div id="order-history-list" style="padding:10px;"></div>
+        <div style="padding:20px;">
+            <button class="full-btn" id="auth-action-btn" onclick="openAuthModal()">Login / Signup</button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="switchView('home', this)">
+            <i class="fas fa-home"></i> Home
+        </button>
+        <button class="nav-btn" onclick="openCart()">
+            <i class="fas fa-shopping-cart"></i> Cart
+        </button>
+        <button class="nav-btn" onclick="checkAuthAndSwitch('profile', this)">
+            <i class="fas fa-user"></i> Profile
+        </button>
+    </nav>
+
+    <div class="modal-overlay" id="product-modal">
+        <div class="bottom-sheet">
+            <span class="close-modal" onclick="closeModal('product-modal')">&times;</span>
+            <img src="" id="pd-img" class="pd-img">
+            <div id="pd-title" class="pd-title"></div>
+            <div class="rating-stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i> (450 reviews)
+            </div>
+            <div id="pd-price" class="pd-price"></div>
+            <div id="pd-desc" class="pd-desc"></div>
+            
+            <button class="full-btn" style="background: var(--accent); color: black;" id="pd-add-btn">Add to Cart</button>
+            <button class="full-btn" style="background: #25D366; margin-top:10px;" id="pd-wa-btn">
+                <i class="fab fa-whatsapp"></i> Buy via WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="auth-modal">
+        <div class="bottom-sheet">
+            <span class="close-modal" onclick="closeModal('auth-modal')">&times;</span>
+            <div class="auth-box">
+                <h2 id="auth-title">Login</h2>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="email" class="input-field">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="pass" class="input-field">
+                </div>
+                <button class="full-btn" onclick="handleAuth()">Continue</button>
+                <p style="text-align:center; margin-top:15px; color:#007185; cursor:pointer;" onclick="toggleAuthMode()" id="auth-toggle">
+                    New to Maruti? Create an account
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="checkout-modal">
+        <div class="bottom-sheet">
+            <span class="close-modal" onclick="closeModal('checkout-modal')">&times;</span>
+            <h3>Checkout</h3>
+            <br>
+            <div class="input-group">
+                <label>Delivery Address</label>
+                <input type="text" id="addr" class="input-field" placeholder="House No, Street, City">
+            </div>
+            <div class="input-group">
+                <label>Payment Method</label>
+                <select id="pay-method" class="input-field">
+                    <option value="COD">Cash on Delivery</option>
+                    <option value="ONLINE">Online Payment (UPI)</option>
+                </select>
+            </div>
+            <button class="full-btn" style="background: var(--accent); color:black;" onclick="confirmOrder()">Place Order</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // --- 1. CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyB9iD4tJvH1fyQRnG17lo-4160KQuSFCmw",
+            authDomain: "amar-7b365.firebaseapp.com",
+            databaseURL: "https://amar-7b365-default-rtdb.firebaseio.com",
+            projectId: "amar-7b365",
+            messagingSenderId: "1074209238712",
+            appId: "1:1074209238712:web:453980e9e0eb7075f64e4d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+
+        // --- 2. GLOBAL STATE ---
+        let currentUser = null;
+        let products = [];
+        let cart = JSON.parse(localStorage.getItem('temp_cart')) || []; // Guest cart initially
+        let isSignup = false;
+
+        // --- 3. INITIALIZATION ---
+        auth.onAuthStateChanged(user => {
+            currentUser = user;
+            if(user) {
+                // User Logged In
+                document.getElementById('user-name-disp').innerText = "Welcome back";
+                document.getElementById('user-email-disp').innerText = user.email;
+                document.getElementById('auth-action-btn').innerText = "Logout";
+                document.getElementById('auth-action-btn').setAttribute('onclick', 'doLogout()');
+                loadOrders(); // Load history
+                
+                // Sync Local Cart to DB could happen here, but keeping simple for now
+            } else {
+                // User Logged Out (Guest)
+                document.getElementById('user-name-disp').innerText = "Guest User";
+                document.getElementById('user-email-disp').innerText = "Login to save orders";
+                document.getElementById('auth-action-btn').innerText = "Login / Signup";
+                document.getElementById('auth-action-btn').setAttribute('onclick', 'openAuthModal()');
+                document.getElementById('order-history-list').innerHTML = '';
+            }
+            updateCartBadge();
+        });
+
+        loadData();
+
+        function loadData() {
+            // Load Products
+            db.ref('products').on('value', snap => {
+                products = [];
+                const grid = document.getElementById('product-grid');
+                grid.innerHTML = '';
+                
+                if(snap.exists()) {
+                    snap.forEach(child => {
+                        const p = child.val();
+                        p.id = child.key;
+                        products.push(p);
+                        renderProductCard(p, grid);
+                    });
+                } else {
+                    grid.innerHTML = '<p style="padding:20px;">No products found.</p>';
+                }
+            });
+
+            // Load Categories
+            db.ref('categories').on('value', snap => {
+                const list = document.getElementById('cat-list');
+                // Keep "All" button, remove others
+                list.innerHTML = `<div class="cat-item active" onclick="filterCat('All', this)"><div class="cat-img-box"><i class="fas fa-th-large"></i></div><div class="cat-name">All</div></div>`;
+                snap.forEach(c => {
+                    list.innerHTML += `
+                        <div class="cat-item" onclick="filterCat('${c.val().name}', this)">
+                            <div class="cat-img-box"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="cat-name">${c.val().name}</div>
+                        </div>`;
+                });
+            });
+
+            // Load Banners
+            db.ref('sliders').on('value', snap => {
+                const slider = document.getElementById('banner-slider');
+                slider.innerHTML = '';
+                snap.forEach(s => {
+                    slider.innerHTML += `<img src="${s.val().url}" class="slide">`;
+                });
+                startSlider();
+            });
+        }
+
+        // --- 4. RENDER UI ---
+        function renderProductCard(p, container) {
+            const html = `
+                <div class="product-card" onclick="openProductDetail('${p.id}')">
+                    <div class="p-img-container">
+                        <img src="${p.image}" class="p-img" alt="${p.name}">
+                    </div>
+                    <div class="p-details">
+                        <div class="p-title">${p.name}</div>
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+                        </div>
+                        <div class="p-price-row">
+                            <span class="p-symbol">₹</span>
+                            <span class="p-price">${p.price}</span>
+                            <span class="p-mrp">₹${Math.round(p.price * 1.2)}</span>
+                        </div>
+                        <button class="p-btn" onclick="event.stopPropagation(); attemptAddToCart('${p.id}')">Add to Cart</button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += html;
+        }
+
+        // --- 5. INTERACTION LOGIC ---
+
+        // Product Details Modal
+        function openProductDetail(id) {
+            const p = products.find(x => x.id === id);
+            if(!p) return;
+            
+            document.getElementById('pd-img').src = p.image;
+            document.getElementById('pd-title').innerText = p.name;
+            document.getElementById('pd-price').innerText = "₹" + p.price;
+            document.getElementById('pd-desc').innerText = p.description || "No description available.";
+            
+            // Buttons
+            document.getElementById('pd-add-btn').onclick = () => { closeModal('product-modal'); attemptAddToCart(id); };
+            
+            // WhatsApp Message
+            const waMsg = `Hi, I am interested in ${p.name} (Price: ₹${p.price})`;
+            document.getElementById('pd-wa-btn').onclick = () => {
+                window.open(`https://wa.me/919876543210?text=${encodeURIComponent(waMsg)}`, '_blank');
+            };
+
+            openModal('product-modal');
+        }
+
+        // Add to Cart Logic (The "Trap")
+        function attemptAddToCart(id) {
+            if(!currentUser) {
+                // OPTION A: Allow guest cart, force login at checkout?
+                // OPTION B: Force login to add (as requested "ask login")
+                // Let's go with Option A (Better UX) -> Add to Guest Cart, Force Login at Checkout
+                addToCart(id);
+            } else {
+                addToCart(id);
+            }
+        }
+
+        function addToCart(id) {
+            const p = products.find(x => x.id === id);
+            const existing = cart.find(x => x.id === id);
+            if(existing) existing.qty++;
+            else cart.push({...p, qty: 1});
+            
+            saveCart();
+            updateCartBadge();
+            // Show tiny notification (toast)
+            alert("Item added to cart"); 
+        }
+
+        function saveCart() {
+            localStorage.setItem('temp_cart', JSON.stringify(cart));
+        }
+
+        function updateCartBadge() {
+            const count = cart.reduce((a,b)=>a+b.qty, 0);
+            document.getElementById('cart-count').innerText = count;
+        }
+
+        function openCart() {
+            switchView('cart', document.querySelectorAll('.nav-btn')[1]);
+            const container = document.getElementById('cart-container');
+            container.innerHTML = '';
+            let total = 0;
+
+            if(cart.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:50px;"><i class="fas fa-shopping-cart" style="font-size:3rem; color:#ccc;"></i><br><br>Cart is empty</div>';
+                document.getElementById('checkout-bar').style.display = 'none';
+                return;
+            }
+
+            cart.forEach((item, idx) => {
+                total += item.price * item.qty;
+                container.innerHTML += `
+                    <div style="background:white; padding:15px; margin-bottom:10px; border-radius:8px; display:flex; gap:10px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+                        <img src="${item.image}" style="width:60px; height:60px; object-fit:contain;">
+                        <div style="flex:1;">
+                            <div style="font-weight:bold; font-size:0.9rem;">${item.name}</div>
+                            <div style="color:var(--danger); font-weight:bold;">₹${item.price}</div>
+                            <div style="margin-top:5px;">
+                                <button onclick="modQty(${idx}, -1)" style="width:25px;">-</button>
+                                <span style="margin:0 10px;">${item.qty}</span>
+                                <button onclick="modQty(${idx}, 1)" style="width:25px;">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('final-total').innerText = "₹" + total;
+            document.getElementById('checkout-bar').style.display = 'block';
+        }
+
+        function modQty(idx, val) {
+            cart[idx].qty += val;
+            if(cart[idx].qty <= 0) cart.splice(idx, 1);
+            saveCart();
+            openCart(); // Re-render
+            updateCartBadge();
+        }
+
+        // --- 6. CHECKOUT FLOW (LOGIN TRAP) ---
+        function initCheckout() {
+            if(!currentUser) {
+                // TRIGGER LOGIN HERE
+                openAuthModal();
+            } else {
+                openModal('checkout-modal');
+            }
+        }
+
+        function confirmOrder() {
+            const addr = document.getElementById('addr').value;
+            if(!addr) return alert("Please enter address");
+            
+            const total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
+            
+            const orderData = {
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                items: cart,
+                total: total,
+                address: addr,
+                paymentMethod: document.getElementById('pay-method').value,
+                status: 'Pending',
+                timestamp: Date.now()
+            };
+            
+            db.ref('orders').push(orderData).then(() => {
+                cart = [];
+                saveCart();
+                updateCartBadge();
+                closeModal('checkout-modal');
+                alert("Order Placed Successfully!");
+                switchView('home', document.querySelectorAll('.nav-btn')[0]);
+            });
+        }
+
+        // --- 7. AUTH HANDLING ---
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.add('open');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
+        }
+
+        function toggleAuthMode() {
+            isSignup = !isSignup;
+            document.getElementById('auth-title').innerText = isSignup ? "Create Account" : "Login";
+            document.getElementById('auth-toggle').innerText = isSignup ? "Already have account? Login" : "New to Maruti? Create an account";
+        }
+
+        function handleAuth() {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('pass').value;
+            
+            if(isSignup) {
+                auth.createUserWithEmailAndPassword(e, p)
+                    .then(() => { closeModal('auth-modal'); alert("Account Created! You can now checkout."); })
+                    .catch(err => alert(err.message));
+            } else {
+                auth.signInWithEmailAndPassword(e, p)
+                    .then(() => { closeModal('auth-modal'); }) // Stay on current page (likely Cart)
+                    .catch(err => alert(err.message));
+            }
+        }
+
+        function doLogout() {
+            auth.signOut().then(() => {
+                alert("Logged Out");
+                switchView('home', document.querySelectorAll('.nav-btn')[0]);
+            });
+        }
+
+        // --- 8. UTILS ---
+        function switchView(viewId, btn) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + viewId).classList.add('active');
+            
+            if(btn) {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+        }
+        
+        function checkAuthAndSwitch(viewId, btn) {
+            if(viewId === 'profile' && !currentUser) {
+                openAuthModal();
+                // Optionally allow viewing guest profile
+                switchView(viewId, btn);
+            } else {
+                switchView(viewId, btn);
+            }
+        }
+
+        function filterCat(catName, btn) {
+            document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            
+            const filtered = catName === 'All' ? products : products.filter(p => p.category === catName);
+            filtered.forEach(p => renderProductCard(p, grid));
+        }
+        
+        // Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            const filtered = products.filter(p => p.name.toLowerCase().includes(term));
+            filtered.forEach(p => renderProductCard(p, grid));
+        });
+        
+        // Orders Logic
+        function loadOrders() {
+             db.ref('orders').orderByChild('userId').equalTo(currentUser.uid).on('value', snap => {
+                 const cont = document.getElementById('order-history-list');
+                 cont.innerHTML = '<h3>Your Orders</h3>';
+                 if(!snap.exists()) { cont.innerHTML += '<p>No orders yet.</p>'; return; }
+                 
+                 snap.forEach(o => {
+                     const ord = o.val();
+                     let trackBtn = '';
+                     if(ord.trackingId) {
+                         trackBtn = `<a href="https://trackcourier.io/anjani-courier-tracking?tracking_id=${ord.trackingId}" target="_blank" style="display:inline-block; margin-top:5px; color:blue; font-size:0.9rem;">Track Order</a>`;
+                     }
+                     
+                     cont.innerHTML += `
+                        <div style="background:white; padding:15px; margin-top:10px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="display:flex; justify-content:space-between;">
+                                <b>Order: ${o.key.substr(-5)}</b>
+                                <span style="color:${ord.status==='Delivered'?'green':'orange'}">${ord.status}</span>
+                            </div>
+                            <div style="font-size:0.9rem; color:#555;">Total: ₹${ord.total} | ${new Date(ord.timestamp).toLocaleDateString()}</div>
+                            ${trackBtn}
+                        </div>
+                     `;
+                 });
+             });
+        }
+
+        // Slider Auto Play
+        let slideIndex = 0;
+        function startSlider() {
+            setInterval(() => {
+                const slides = document.getElementsByClassName("slide");
+                if(slides.length === 0) return;
+                slideIndex++;
+                if (slideIndex >= slides.length) { slideIndex = 0; }
+                document.getElementById('banner-slider').style.transform = `translateX(-${slideIndex * 100}%)`;
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
